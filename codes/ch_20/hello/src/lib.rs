@@ -1,6 +1,6 @@
 use std::{
-    thread, 
     sync::{mpsc, Arc, Mutex},
+    thread,
 };
 
 pub struct ThreadPool {
@@ -28,21 +28,21 @@ impl ThreadPool {
 
         for id in 0..size {
             workers.push(Worker::new(id, Arc::clone(&receiver)));
-        };
+        }
 
-        ThreadPool { 
-            workers, 
-            sender: Some(sender) 
+        ThreadPool {
+            workers,
+            sender: Some(sender),
         }
     }
 
     pub fn execute<F>(&self, f: F)
     where
         F: FnOnce() + Send + 'static,
-        {
-            let job = Box::new(f);
-            self.sender.as_ref().unwrap().send(job).unwrap();
-        }
+    {
+        let job = Box::new(f);
+        self.sender.as_ref().unwrap().send(job).unwrap();
+    }
 }
 
 impl Drop for ThreadPool {
@@ -83,7 +83,7 @@ impl Worker {
         });
 
         Worker {
-            id, 
+            id,
             thread: Some(thread),
         }
     }

@@ -1,8 +1,7 @@
 use chrono::offset::Local;
 use hello::ThreadPool;
 use std::{
-    fs,
-    env,
+    env, fs,
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
     thread,
@@ -35,14 +34,14 @@ fn handle_connection(mut stream: TcpStream) {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "hello.html"),
         "GET /sleep HTTP/1.1" => {
             for i in 0..5 {
-                println!("sleep {}th second.", i+1);
+                println!("sleep {}th second.", i + 1);
                 thread::sleep(Duration::from_secs(1));
             }
             ("HTTP/1.1 200 OK", "sleep.html")
         }
         _ => ("HTTP/1.1 404 NOT FOUND", "404.html"),
     };
-        
+
     println!("status_line: {}, filename: {}", status_line, filename);
     let contents = fs::read_to_string(filename).unwrap();
     let length = contents.len();
@@ -77,7 +76,6 @@ fn print_server_info(ip: &str, port: u32) {
     println!("{}", format_time);
     println!("Starting development server {}", host);
     println!("Quit the server with CONTROL-C.");
-
 }
 
 fn print_rust_env() {
