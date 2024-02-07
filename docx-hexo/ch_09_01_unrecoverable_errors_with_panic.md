@@ -1,43 +1,9 @@
-### 使用`panic!`处理不可恢复错误
-
-有时，你的代码里会发生bug，并且你什么也做不了。在这种情况，Rust有`panic!`宏。在实践中有两种方式会导致panic：通过采取导致代码panic的操作(例如访问超出末尾的数组)通过显式调用`panic!`宏。默认情况下，panic会打印一个失败的信息，展开并清理栈数据，然后退出。通过一个环境变量，你也可以让 Rust 在 panic 发生时打印调用堆栈（call stack）以便于定位 panic 的原因。
-
-> #### 对应panic时的栈展开或终止
->
-> 当出现panic时，程序默认会**展开**(unwinding)，这意味着Rust会回溯栈并清理它遇到的每一个函数的数据，不过这个回溯并清理的过程有很多工作。另外一种选择是直接**终止**(abort)，这会不清理数据就退出程序。
->
-> 那么程序所使用的内存需要由操作系统来清理。如果你需要项目的最终二进制文件越小越好，panic时通过`Cargo.toml`的`[profile]`部分增加`panic = 'abort'`，可以由展开切换为终止。例如，如果你想在release模式中panic时终止：
->
-> ```toml
-> [profile.release]
-> panic = 'abort'
-> ```
-
-让我们在一个简单的程序中调用`panic!`:
-
-src/main.rs
-
-```rust
-fn main() {
-    panic!("crash and burn");
-}
-```
-
-当你运行这个程序，你会看到如下的错误：
-
-```rust
-$ cargo run
-   Compiling panic v0.1.0 (file:///projects/panic)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.25s
-     Running `target/debug/panic`
-thread 'main' panicked at 'crash and burn', src/main.rs:2:5
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-```
-
-调用`panic!`导致错误在最后两行进行了详细说明。第一行展示了panic的信息并告诉我们错误代码的地址在:`src/main.rs:2:5`，意思是在`src/main.rs`这个文件的第2行，第5个字符。
-
-这个示例中，错误信息是发生在我们自己编写的代码中，我们在对应的位置就能找到`panic!`调用。在另外的一些情况中，`panic!`有可能出现在我们调用的代码中。错误信息报告的文件和行号可能指向别人代码中的`panic!`调用，而不是我们代码中最终导致`panic!`的那一行。我们可以使用`panic!`被调用的函数的backtrace来寻找代码中出问题的地方。下面我们来详细介绍backtrace是什么。
-
+---
+title: Ch 09.01:使用`panic!`的backtrace
+date: 2023-05-18 10:18
+tags: Rust
+layout: Rust
+---
 #### 使用`panic!`的backtrace
 
 让我们来看看另外一个例子，当因为我们自己的代码有bug而导致库函数调用`panic!`是什么样的。如Listing 9-1所示的代码尝试访问超出范围的vector的索引。
